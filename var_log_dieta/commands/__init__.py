@@ -19,7 +19,7 @@ def run_command(command_func, argument_parser=None):
         level = logging.DEBUG if options.verbosity > 1 else logging.INFO
         logging.basicConfig(stream=sys.stdout,
                             level=level,
-                            format='%(asctime)s %(levelname)6s %(message)s')
+                            format='%(asctime)s %(levelname)7s %(message)s')
 
     return command_func(options)
 
