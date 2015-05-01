@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import argparse
 import collections
 import logging
 import os
@@ -18,12 +19,13 @@ def main():
     logging.basicConfig(stream=sys.stdout,
                         level=logging.DEBUG,
                         format='%(asctime)s %(levelname)6s %(message)s')
+    options = _get_arg_parser().parse_args()
     ingredients = {
         i.name.lower(): i
         for i in load_ingredients(os.path.join(DATA_DIR, 'ingredients'))
     }
 
-    log = process_log(sys.argv[1], ingredients)
+    log = process_log(options.file, ingredients)
     print
     print_log(log)
 
@@ -44,6 +46,16 @@ def _log_values(nut_value):
         f: "???" if v is None else "{:.1f}".format(v)
         for f, v in nut_value._asdict().items()
     }
+
+
+def _get_arg_parser():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('file', help='file/directory to process')
+    parser.add_argument('-d', '--depth',
+                        default=None,
+                        type=int,
+                        help="Max depth to show")
+    return parser
 
 
 def print_log(log,
