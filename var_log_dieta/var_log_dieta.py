@@ -52,8 +52,6 @@ def print_log(log,
               width=100,
               colors=_DEFAULT_COLORS,
               max_levels=None):
-    if max_levels is not None and level >= max_levels:
-        return
     right_part = format % _log_values(log.nutritional_value)
     left_part = '{}{}:'.format(' ' * level, log.name)
     right_size = max(0, width - len(left_part) - 2)
@@ -68,7 +66,7 @@ def print_log(log,
 
     print color(format_str.format(left_part, right_part)) + unknown_marker
 
-    if log.parts:
+    if log.parts and (max_levels is None or level < max_levels):
         # print
         for part in log.parts:
             print_log(part, format, level + 1,
