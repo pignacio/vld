@@ -13,6 +13,7 @@ from .constants import DATA_DIR
 from .conversions import CantConvert
 from .objects import NutritionalValue
 from .serialization import load_ingredients
+from .utils import get_terminal_size
 
 
 def main():
@@ -27,7 +28,8 @@ def main():
 
     log = process_log(options.file, ingredients)
     print
-    print_log(log)
+    width = get_terminal_size()[0]
+    print_log(log, max_levels=options.depth, width=width)
 
 
 LogData = collections.namedtuple('LogData', ['name', 'nutritional_value',
@@ -83,7 +85,8 @@ def print_log(log,
         for part in log.parts:
             print_log(part, format, level + 1,
                       colors=colors,
-                      max_levels=max_levels)
+                      max_levels=max_levels,
+                      width=width)
         print
 
 
