@@ -1,4 +1,5 @@
-# -*- coding: utf-8 -*-
+#!/usr/bin/env python
+# encoding: utf-8
 import argparse
 import collections
 import logging
@@ -39,8 +40,7 @@ _DEFAULT_FORMAT = (
     '%(calories)s kCal (%(carbs)4s c, %(protein)4s p, %(fat)4s f) '
     '[%(fiber)4s]')
 
-_DEFAULT_COLORS = [bright_green, bright_blue, bright_magenta, bright_cyan,
-                   red]
+_DEFAULT_COLORS = [bright_green, bright_blue, bright_magenta, bright_cyan, red]
 
 
 def _log_values(nut_value):
