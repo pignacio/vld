@@ -17,14 +17,17 @@ def load_ingredients(directory):
             "Invalid ingredient directory: '{}'".format(directory))
     logger.info("Loading ingredients from '%s'", directory)
     ingredients = []
-    for path, subdirs, filenames in os.walk(directory):
+    for path, _subdirs, filenames in os.walk(directory):
         for filename in filenames:
             fullpath = os.path.join(path, filename)
             logging.debug(" - Parsing ingredients from '%s'", fullpath)
             with open(fullpath) as fin:
-                json_list = json.load(fin)
+                parsed = json.load(fin)
+
+            if not isinstance(parsed, list):
+                parsed = [parsed]
             ingredients.extend([Ingredient.from_json(data)
-                                for data in json_list])
+                                for data in parsed])
 
     logger.info("Loaded %d ingredients", len(ingredients))
     return ingredients
