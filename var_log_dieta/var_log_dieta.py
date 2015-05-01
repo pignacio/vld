@@ -83,14 +83,16 @@ def process_log(path, ingredients):
     else:
         log_parts = sorted(os.listdir(path))
 
-        parts = []
         if '__init__' in log_parts:
             log_parts.remove('__init__')
             init = process_log(os.path.join(path, '__init__'), ingredients)
-            parts = init.parts
+            init_parts = init.parts
+        else:
+            init_parts = []
 
-        parts.extend([process_log(os.path.join(path, p), ingredients)
-                      for p in log_parts])
+        parts = [process_log(os.path.join(path, p), ingredients)
+                 for p in log_parts]
+        parts.extend(init_parts)
 
     return LogData(name=os.path.basename(path),
                    nutritional_value=NutritionalValue.sum(p.nutritional_value
