@@ -43,7 +43,8 @@ setup(
     test_suite='tests',
     entry_points={
         'console_scripts': [
-            'vld=var_log_dieta.var_log_dieta:main',
+            'vld=var_log_dieta.commands:vld_report',
+            'vld-report=var_log_dieta.commands:vld_report',
         ],
     }
 )

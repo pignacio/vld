@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import, unicode_literals, division
 
+import argparse
 import logging
 
 logger = logging.getLogger(__name__)  # pylint: disable=invalid-name
@@ -32,3 +33,12 @@ def get_terminal_size():
     if not cr:
         cr = (env.get('LINES', 25), env.get('COLUMNS', 80))
     return int(cr[1]), int(cr[0])
+
+
+def base_argument_parser():
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "-v", "--verbosity",
+        action='count',
+        help='Enable logging. If set twice, sets level to DEBUG.')
+    return parser
