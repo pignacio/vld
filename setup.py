@@ -45,6 +45,7 @@ setup(
         'console_scripts': [
             'vld=var_log_dieta.commands:vld_report',
             'vld-report=var_log_dieta.commands:vld_report',
+            'vld-new-ingredient=var_log_dieta.commands:vld_new_ingredient',
         ],
     }
 )

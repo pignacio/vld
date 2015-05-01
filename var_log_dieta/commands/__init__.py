@@ -6,7 +6,8 @@ import logging
 import sys
 
 from ..utils import base_argument_parser
-from . import report
+from . import report, new_ingredient
+
 logger = logging.getLogger(__name__)  # pylint: disable=invalid-name
 
 
@@ -26,3 +27,8 @@ def run_command(command_func, argument_parser=None):
 
 def vld_report():
     return run_command(report.main, report.get_argument_parser())
+
+
+def vld_new_ingredient():
+    return run_command(new_ingredient.main,
+                       new_ingredient.get_argument_parser())
