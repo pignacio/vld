@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import, unicode_literals, division
 
+import collections
 import logging
 
 from pignacio_scripts.namedtuple import namedtuple_with_defaults
@@ -10,6 +11,11 @@ from .constants import DEFAULT_CONVERSIONS
 from .conversions import get_conversion_table, CantConvert
 
 logger = logging.getLogger(__name__)  # pylint: disable=invalid-name
+
+LogData = namedtuple_with_defaults('LogData', ['name', 'nutritional_value',
+                                               'parts'],
+                                   defaults=lambda: {'parts': []})
+LogLine = collections.namedtuple('LogLine', ['name', 'amount', 'unit'])
 
 _NUTRITIONAL_VALUE_FIELDS = [
     'calories',
@@ -26,6 +32,8 @@ _NutritionalValue = namedtuple_with_defaults(
     _NUTRITIONAL_VALUE_FIELDS,
     defaults={f: None for f in _NUTRITIONAL_VALUE_FIELDS}
 )  # yapf: disable
+
+
 class NutritionalValue(_NutritionalValue):
     UNKNOWN = None
 
@@ -58,6 +66,8 @@ _Ingredient = namedtuple_with_defaults(
         'conversions': {},
     }
 )  # yapf: disable
+
+
 class Ingredient(_Ingredient):
     def __init__(self, *args, **kwargs):
         super(Ingredient, self).__init__(*args, **kwargs)
