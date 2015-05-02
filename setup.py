@@ -13,6 +13,7 @@ with open('HISTORY.rst') as history_file:
 
 requirements = [
     "pignacio_scripts",
+    "unidecode",
 ]
 
 setup(
@@ -46,6 +47,7 @@ setup(
             'vld=var_log_dieta.commands:vld_report',
             'vld-report=var_log_dieta.commands:vld_report',
             'vld-new-ingredient=var_log_dieta.commands:vld_new_ingredient',
+            'vld-count=var_log_dieta.commands:vld_count',
         ],
     }
 )
