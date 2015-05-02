@@ -9,6 +9,7 @@ from pignacio_scripts.terminal.color import (bright_blue, bright_cyan,
                                              bright_red, red)
 
 from ..constants import DATA_DIR
+from ..ingredient import IngredientMap
 from ..objects import NutritionalValue, LogData
 from ..parse import parse_log_data, ParseError
 from ..serialization import load_ingredients
@@ -24,10 +25,8 @@ _DEFAULT_COLORS = [bright_green, bright_blue, bright_magenta, bright_cyan, red]
 
 
 def main(options):
-    ingredients = {
-        i.name.lower(): i
-        for i in load_ingredients(os.path.join(DATA_DIR, 'ingredients'))
-    }
+    ingredients = IngredientMap(load_ingredients(os.path.join(DATA_DIR,
+                                                              'ingredients')))
 
     log = process_log(options.file, ingredients)
     width = get_terminal_size()[0]
