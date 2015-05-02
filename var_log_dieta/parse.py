@@ -28,7 +28,7 @@ def parse_log_line(line):
     try:
         amount = float(amount)
     except ValueError:
-        raise ParseError('Invalid amount: "%s"', amount)
+        raise ParseError('Invalid amount: "{}"'.format(amount))
     return LogLine(name=name, amount=amount, unit=unit)
 
 
@@ -38,7 +38,7 @@ def parse_log_data(line, ingredients):
     try:
         ingredient = ingredients[parsed.name]
     except KeyError:
-        raise ParseError('Invalid ingredient: "%s"', parsed.name)
+        raise ParseError('Invalid ingredient: "{}"'.format(parsed.name))
     try:
         nut_value = ingredient.get_nutritional_value(parsed.amount,
                                                      parsed.unit)
