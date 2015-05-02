@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import, unicode_literals, division
 
-import collections
 import logging
 import os
 
@@ -10,15 +9,12 @@ from pignacio_scripts.terminal.color import (bright_blue, bright_cyan,
                                              bright_red, red)
 
 from ..constants import DATA_DIR
-from ..conversions import CantConvert
-from ..objects import NutritionalValue
+from ..objects import NutritionalValue, LogData
+from ..parse import parse_log_data, ParseError
 from ..serialization import load_ingredients
 from ..utils import base_argument_parser, get_terminal_size
 
 logger = logging.getLogger(__name__)  # pylint: disable=invalid-name
-
-LogData = collections.namedtuple('LogData', ['name', 'nutritional_value',
-                                             'parts'])
 
 _DEFAULT_FORMAT = (
     '%(calories)s kCal (%(carbs)4s c, %(protein)4s p, %(fat)4s f) '
@@ -55,6 +51,7 @@ def _log_values(nut_value):
     }
 
 
+# pylint: disable=too-many-arguments,redefined-builtin
 def print_log(log,
               format=_DEFAULT_FORMAT,
               level=0,
@@ -109,46 +106,17 @@ def process_log(path, ingredients):
 
 
 def get_log_file_parts(path, ingredients):
-    parts = []
     with open(path) as fin:
-        lines = fin.readlines()
+        lines = (l for l in fin if l.strip() and not l.strip().startswith('#'))
 
-    lines = [l for l in lines if l.strip() and not l.strip().startswith('#')]
-
-    for line_num, line in enumerate(lines):
-        line = line.rstrip()
-        name, quantity = line.split(',', 1)
-        amount, unit = quantity.split(None, 1)
-
-        try:
-            ingredient = ingredients[name.lower()]
-        except KeyError:
-            logging.warning('Invalid ingredient: "%s" (%s:%s)', name, path,
-                            line_num)
-            ingredient = None
-
-        nutritional_value = _get_line_nutritional_value(path, line_num, amount,
-                                                        unit, ingredient)
-        data_name = name if ingredient is None else ingredient.name
-        parts.append(LogData(name='{}, {} {}'.format(data_name, amount, unit),
-                             nutritional_value=nutritional_value,
-                             parts=[]))
-
-    return parts
+        return [make_log_data(l, ingredients, path, ln)
+                for ln, l in enumerate(lines)]
 
 
-def _get_line_nutritional_value(path, line_num, amount, unit, ingredient):
-    if ingredient is None:
-        return NutritionalValue.UNKNOWN
-
+def make_log_data(line, ingredients, path, line_num):
     try:
-        amount = float(amount)
-    except ValueError:
-        logging.warning('Invalid amount: "%s" (%s:%s)', amount, path, line_num)
-        return NutritionalValue.UNKNOWN
-
-    try:
-        return ingredient.get_nutritional_value(amount, unit)
-    except CantConvert as err:
-        logging.warning(str(err) + " ({}:{})".format(path, line_num))
-        return NutritionalValue.UNKNOWN
+        return parse_log_data(line, ingredients)
+    except ParseError as err:
+        logging.warning("%s (%s:%s)", err, path, line_num)
+        return LogData(name=line.strip(),
+                       nutritional_value=NutritionalValue.UNKNOWN)
