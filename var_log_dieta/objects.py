@@ -12,10 +12,13 @@ from .conversions import get_conversion_table, CantConvert
 
 logger = logging.getLogger(__name__)  # pylint: disable=invalid-name
 
-LogData = namedtuple_with_defaults('LogData', ['name', 'nutritional_value',
-                                               'parts'],
-                                   defaults=lambda: {'parts': []})
-LogLine = collections.namedtuple('LogLine', ['name', 'amount', 'unit'])
+LogData = namedtuple_with_defaults(
+    'LogData', ['name', 'nutritional_value', 'parts', 'log_line'],
+    defaults=lambda: {'parts': [],
+                      'log_line': None})
+LogLine = namedtuple_with_defaults('LogLine', ['name', 'amount', 'unit',
+                                               'ingredient'],
+                                   defaults={'ingredient': None})
 
 _NUTRITIONAL_VALUE_FIELDS = [
     'calories',
