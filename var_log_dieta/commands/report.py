@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import, unicode_literals, division
 
+import collections
 import logging
 import os
 
@@ -9,6 +10,7 @@ from pignacio_scripts.terminal.color import (bright_blue, bright_cyan,
                                              bright_red, red)
 
 from ..constants import DATA_DIR
+from ..conversions import CantConvert
 from ..ingredient import IngredientMap
 from ..objects import NutritionalValue, LogData
 from ..parse import parse_log_data, ParseError
@@ -30,6 +32,9 @@ def main(options):
 
     log = process_log(options.file, ingredients)
     width = get_terminal_size()[0]
+    if options.by_ingredient:
+        log = group_by_ingredient(log, ingredients)
+        options.depth = None
     print_log(log, max_levels=options.depth, width=width)
 
 
@@ -39,7 +44,12 @@ def get_argument_parser():
     parser.add_argument('-d', '--depth',
                         default=None,
                         type=int,
-                        help="Max depth to show")
+                        help="Max depth to show.")
+    parser.add_argument(
+        '--by-ingredient',
+        action='store_true',
+        default=False,
+        help="Report the nutritional value grouped by ingredient.")
     return parser
 
 
@@ -119,3 +129,56 @@ def make_log_data(line, ingredients, path, line_num):
         logging.warning("%s (%s:%s)", err, path, line_num)
         return LogData(name=line.strip(),
                        nutritional_value=NutritionalValue.UNKNOWN)
+
+
+def extract_log_lines(log):
+    lines = []
+    if log.log_line is not None:
+        lines.append(log.log_line)
+    for part in log.parts:
+        lines.extend(extract_log_lines(part))
+    return lines
+
+
+def group_by_ingredient(log, ingredients):
+    log_lines = extract_log_lines(log)
+
+    grouped = collections.defaultdict(lambda: collections.defaultdict(int))
+
+    for log_line in log_lines:
+        if log_line.ingredient is not None:
+            grouped[log_line.ingredient.name][log_line.unit] += log_line.amount
+
+    log_datas = []
+
+    for ingredient_name, amounts in grouped.items():
+        ingredient = ingredients[ingredient_name]
+        parts = []
+        for unit, amount in amounts.items():
+            try:
+                nut_value = ingredient.get_nutritional_value(amount, unit)
+            except CantConvert as err:
+                logger.warning(str(err))
+                nut_value = NutritionalValue.UNKNOWN
+            parts.append(LogData(
+                name="{} ({} {})".format(ingredient.name, amount, unit),
+                nutritional_value=nut_value))
+        parts.sort(key=lambda x: x.nutritional_value.calories, reverse=True)
+
+        if len(parts) == 1:
+            log_datas.append(parts[0])
+        else:
+            name = "{} ({})".format(ingredient.name,
+                                    " + ".join("{:.2f} {}".format(v, k)
+                                               for k, v in amounts.items()))
+            log_datas.append(LogData(name=name,
+                                     parts=parts,
+                                     nutritional_value=NutritionalValue.sum(
+                                         p.nutritional_value for p in parts)))
+
+    log_datas.sort(key=lambda x: x.nutritional_value.calories, reverse=True)
+
+    return LogData(name='By ingredient',
+                   nutritional_value=NutritionalValue.sum(ld.nutritional_value
+                                                          for ld in log_datas),
+                   parts=log_datas)
