@@ -47,4 +47,6 @@ def parse_log_data(line, ingredients):
 
     return LogData(
         name='{}, {} {}'.format(ingredient.name, parsed.amount, parsed.unit),
-        nutritional_value=nut_value)
+        nutritional_value=nut_value,
+        log_line=parsed._replace(ingredient=ingredient),
+    )
