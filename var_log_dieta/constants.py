@@ -11,4 +11,7 @@ DATA_DIR = 'data'
 DEFAULT_CONVERSIONS = {
     'kg': {'g': 1000},
     'l': {'ml': 1000},
+    'taza': {'ml': 250},
+    'tazon': {'ml': 350},
+    'vaso': {'ml': 300},
 }  # yapf: disable
