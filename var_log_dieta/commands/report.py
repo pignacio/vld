@@ -31,6 +31,9 @@ def main(options):
                                                               'ingredients')))
 
     log = process_log(options.file, ingredients)
+    if log is None:
+        print "The log was empty :("
+        return
     width = get_terminal_size()[0]
     if options.by_ingredient:
         log = group_by_ingredient(log, ingredients)
@@ -100,7 +103,7 @@ def process_log(path, ingredients):
         if '__init__' in log_parts:
             log_parts.remove('__init__')
             init = process_log(os.path.join(path, '__init__'), ingredients)
-            init_parts = init.parts
+            init_parts = init.parts if init else []
         else:
             init_parts = []
 
@@ -108,6 +111,10 @@ def process_log(path, ingredients):
                  for p in log_parts]
         parts.extend(init_parts)
 
+    parts = [p for p in parts if p]
+
+    if not parts:
+        return None
     return LogData(name=os.path.basename(path),
                    nutritional_value=NutritionalValue.sum(p.nutritional_value
                                                           for p in parts),
