@@ -116,11 +116,7 @@ def process_log(path, ingredients):
 
     if not parts:
         return None
-    return LogData(name=os.path.basename(path),
-                   nutritional_value=NutritionalValue.sum(p.nutritional_value
-                                                          for p in parts),
-                   parts=parts,
-                   incomplete=any(p.incomplete for p in parts))
+    return LogData.from_parts(os.path.basename(path), parts)
 
 
 def get_log_file_parts(path, ingredients):
@@ -181,14 +177,8 @@ def group_by_ingredient(log, ingredients):
             name = "{} ({})".format(ingredient.name,
                                     " + ".join("{:.2f} {}".format(v, k)
                                                for k, v in amounts.items()))
-            log_datas.append(LogData(name=name,
-                                     parts=parts,
-                                     nutritional_value=NutritionalValue.sum(
-                                         p.nutritional_value for p in parts)))
+            log_datas.append(LogData.from_parts(name, parts))
 
     log_datas.sort(key=lambda x: x.nutritional_value.calories, reverse=True)
 
-    return LogData(name='By ingredient',
-                   nutritional_value=NutritionalValue.sum(ld.nutritional_value
-                                                          for ld in log_datas),
-                   parts=log_datas)
+    return LogData.from_parts('By ingredient', log_datas)
