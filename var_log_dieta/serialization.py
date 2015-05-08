@@ -22,12 +22,16 @@ def load_ingredients(directory):
             fullpath = os.path.join(path, filename)
             logging.debug(" - Parsing ingredients from '%s'", fullpath)
             with open(fullpath) as fin:
-                parsed = json.load(fin)
+                try:
+                    parsed = json.load(fin)
+                except Exception:
+                    logger.exception("Could not parse JSON from '%s'",
+                                     fullpath)
+                    continue
 
             if not isinstance(parsed, list):
                 parsed = [parsed]
-            ingredients.extend([Ingredient.from_json(data)
-                                for data in parsed])
+            ingredients.extend([Ingredient.from_json(data) for data in parsed])
 
     logger.info("Loaded %d ingredients", len(ingredients))
     return ingredients
