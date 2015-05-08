@@ -81,9 +81,11 @@ def print_log(log,
     except IndexError:
         color = lambda s: s
 
-    unknown_marker = bright_red(" *") if "???" in right_part else ""
+    incomplete_marker = bright_red("!") if log.incomplete else " "
+    unknown_marker = bright_red("*") if "???" in right_part else " "
 
-    print color(format_str.format(left_part, right_part)) + unknown_marker
+    print(color(format_str.format(left_part, right_part)) + unknown_marker +
+          incomplete_marker)
 
     if log.parts and (max_levels is None or level < max_levels):
         for part in log.parts:
@@ -118,7 +120,8 @@ def process_log(path, ingredients):
     return LogData(name=os.path.basename(path),
                    nutritional_value=NutritionalValue.sum(p.nutritional_value
                                                           for p in parts),
-                   parts=parts)
+                   parts=parts,
+                   incomplete=any(p.incomplete for p in parts))
 
 
 def get_log_file_parts(path, ingredients):
@@ -135,7 +138,8 @@ def make_log_data(line, ingredients, path, line_num):
     except ParseError as err:
         logging.warning("%s (%s:%s)", err, path, line_num)
         return LogData(name=line.strip(),
-                       nutritional_value=NutritionalValue.UNKNOWN)
+                       nutritional_value=NutritionalValue.UNKNOWN,
+                       incomplete=True)
 
 
 def extract_log_lines(log):
