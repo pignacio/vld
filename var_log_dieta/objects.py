@@ -90,11 +90,16 @@ class Ingredient(_Ingredient):
         if self.__conversion_table is None:
             self.__conversion_table = get_conversion_table(self.conversions,
                                                            DEFAULT_CONVERSIONS)
-        try:
-            unit_factor = self.__conversion_table[unit][self.sample_unit]
-        except KeyError:
-            raise CantConvert("Cannot convert '{}' from '{}' to '{}'".format(
-                self.name, self.sample_unit, unit))
+
+        if unit == self.sample_unit:
+            unit_factor = 1.0
+        else:
+            try:
+                unit_factor = self.__conversion_table[unit][self.sample_unit]
+            except KeyError:
+                raise CantConvert(
+                    "Cannot convert '{}' from '{}' to '{}'".format(
+                        self.name, self.sample_unit, unit))
 
         factor = amount / self.sample_size * unit_factor
         new_values = {
