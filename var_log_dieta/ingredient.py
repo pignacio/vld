@@ -20,4 +20,4 @@ class IngredientMap(object):
 
     @staticmethod
     def _normalize_name(name):
-        return unidecode(name).lower()
+        return unidecode(name.strip()).lower()
