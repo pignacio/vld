@@ -38,9 +38,7 @@ def main(options):
         print
 
     if len(datas) > 1:
-        print_log_data(LogData(name="TOTAL",
-                               nutritional_value=NutritionalValue.sum(
-                                   d.nutritional_value for d in datas)))
+        print_log_data(LogData.from_parts("TOTAL", datas))
 
 
 def make_log_data(line, ingredient_map, part_num):
