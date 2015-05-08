@@ -37,7 +37,6 @@ def main(options):
     width = get_terminal_size()[0]
     if options.by_ingredient:
         log = group_by_ingredient(log, ingredients)
-        options.depth = None
     print_log(log, max_levels=options.depth, width=width)
 
 
