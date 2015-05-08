@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import, unicode_literals, division
 
-import collections
 import logging
 
 from pignacio_scripts.namedtuple import namedtuple_with_defaults
@@ -12,12 +11,25 @@ from .conversions import get_conversion_table, CantConvert
 
 logger = logging.getLogger(__name__)  # pylint: disable=invalid-name
 
-LogData = namedtuple_with_defaults(
+_LogData = namedtuple_with_defaults(
     'LogData', ['name', 'nutritional_value', 'parts', 'log_line',
                 'incomplete'],
     defaults=lambda: {'parts': [],
                       'log_line': None,
                       'incomplete': False})
+
+
+class LogData(_LogData):
+    __slots__ = ()
+
+    @classmethod
+    def from_parts(cls, name, parts):
+        return cls(name=name,
+                   parts=parts,
+                   nutritional_value=NutritionalValue.sum(p.nutritional_value
+                                                          for p in parts),
+                   incomplete=any(p.incomplete for p in parts))
+
 
 LogLine = namedtuple_with_defaults('LogLine', ['name', 'amount', 'unit',
                                                'ingredient'],
