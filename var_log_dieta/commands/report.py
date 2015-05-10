@@ -96,6 +96,7 @@ def print_log(log,
 
 
 def process_log(path, ingredients):
+    path = path.rstrip("/")
     if os.path.isfile(path):
         parts = get_log_file_parts(path, ingredients)
     else:
