@@ -15,8 +15,8 @@ class ParseError(Exception):
     pass
 
 
-RE_INGREDIENT_COMMA_QUANTITY = r'{ingredient_re},\s*{quantity_re}'
-RE_QUANTITY_OF_INGREDIENT = r'{quantity_re}\s+(de |of )?{ingredient_re}'
+RE_INGREDIENT_COMMA_QUANTITY = r'^{ingredient_re},\s*{quantity_re}$'
+RE_QUANTITY_OF_INGREDIENT = r'^{quantity_re}\s+(de |of )?{ingredient_re}$'
 
 RE_INGREDIENT = r'(?P<ingredient>.+)'
 RE_QUANTITY = r'(?P<amount>[\d.]+(?:\s*/\s*[\d.]+)?)\s*(?P<unit>{units_re})'
