@@ -87,3 +87,6 @@ class ParseLogLineTests(TestCase):
 
     def test_empty_unit_fails_by_default(self):
         self.assertRaises(ParseError, parse_log_line, "1 grande")
+
+    def test_unit_plurals(self):
+        self._test_parse("2 gs the ing", "the ing", 2, "g", valid_units=("g",))

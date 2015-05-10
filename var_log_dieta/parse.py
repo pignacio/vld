@@ -19,7 +19,7 @@ RE_INGREDIENT_COMMA_QUANTITY = r'^{ingredient_re},\s*{quantity_re}$'
 RE_QUANTITY_OF_INGREDIENT = r'^{quantity_re}\s+(de |of )?{ingredient_re}$'
 
 RE_INGREDIENT = r'(?P<ingredient>.+)'
-RE_QUANTITY = r'(?P<amount>[\d.]+(?:\s*/\s*[\d.]+)?)\s*(?P<unit>{units_re})'
+RE_QUANTITY = r'(?P<amount>[\d.]+(?:\s*/\s*[\d.]+)?)\s*(?P<unit>{units_re})s?'
 
 
 def parse_log_line(line, valid_units=None, empty_unit=None):
@@ -33,7 +33,7 @@ def parse_log_line(line, valid_units=None, empty_unit=None):
                 ored_units = "|" + ored_units
             units_re = "(?:{})".format(ored_units)
         else:
-            units_re = r"\w" + ("*" if empty_unit else "+")
+            units_re = r"\w" + ("*?" if empty_unit else "+?")
 
         quantity_re = RE_QUANTITY.format(units_re=units_re)
         logline_re = regexp.format(ingredient_re=RE_INGREDIENT,
