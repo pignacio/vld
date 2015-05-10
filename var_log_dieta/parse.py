@@ -49,12 +49,12 @@ def parse_log_line(line, valid_units=None, empty_unit=None):
             try:
                 amount = float(eval(amount))
             except (ValueError, TypeError, SyntaxError):
-                raise ValueError('"{}" is not a valid amount.'.format(amount))
+                raise ParseError('"{}" is not a valid amount.'.format(amount))
 
             return LogLine(name=ingredient, amount=amount, unit=unit)
         else:
             logger.debug('"%s" did not match "%s"', logline_re, line)
-    raise ValueError('"{}" is not a valid log line.'.format(line))
+    raise ParseError('"{}" is not a valid log line.'.format(line))
 
 
 def _parse_log_line(line):
