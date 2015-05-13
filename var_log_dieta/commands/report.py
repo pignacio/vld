@@ -37,6 +37,8 @@ def main(options):
     width = get_terminal_size()[0]
     if options.by_ingredient:
         log = group_by_ingredient(log, ingredients)
+    elif options.by_category:
+        log = group_by_category(log, ingredients)
     print_log(log, max_levels=options.depth, width=width)
 
 
@@ -52,6 +54,11 @@ def get_argument_parser():
         action='store_true',
         default=False,
         help="Report the nutritional value grouped by ingredient.")
+    parser.add_argument(
+        '--by-category',
+        action='store_true',
+        default=False,
+        help="Report the nutritional value grouped by category.")
     return parser
 
 
@@ -190,3 +197,23 @@ def group_by_ingredient(log, ingredients):
     log_datas.sort(key=lambda x: x.nutritional_value.calories, reverse=True)
 
     return LogData.from_parts('By ingredient', log_datas)
+
+
+def group_by_category(log, ingredients):
+    by_ingredient = group_by_ingredient(log, ingredients)
+    by_category = collections.defaultdict(list)
+
+    for part in by_ingredient.parts:
+        try:
+            category = part.ingredient.categories[0]
+        except (IndexError, AttributeError):
+            category = 'unknown'
+
+        by_category[category.strip().lower()].append(part)
+
+    categories = [LogData.from_parts(category.capitalize(), parts)
+                  for category, parts in by_category.items()]
+
+    categories.sort(key=lambda d: d.nutritional_value.calories, reverse=True)
+
+    return LogData.from_parts('By categories', categories)
