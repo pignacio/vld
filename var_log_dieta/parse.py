@@ -32,7 +32,9 @@ def parse_log_line(line, valid_units=None, empty_unit=None):
                 ored_units = "|" + ored_units
             units_re = "(?:{})".format(ored_units)
         else:
-            units_re = r"\w" + ("*?" if empty_unit else "+?")
+            units_re = r"\w[\w ]*?"
+            if empty_unit:
+                units_re = "(?:|{})".format(units_re)
 
         quantity_re = RE_QUANTITY.format(units_re=units_re)
         logline_re = regexp.format(ingredient_re=RE_INGREDIENT,
