@@ -37,6 +37,8 @@ def main(options):
     width = get_terminal_size()[0]
     if options.by_ingredient:
         log = group_by_ingredient(log, ingredients)
+    elif options.by_category:
+        log = group_by_category(log, ingredients)
     print_log(log, max_levels=options.depth, width=width)
 
 
@@ -52,6 +54,11 @@ def get_argument_parser():
         action='store_true',
         default=False,
         help="Report the nutritional value grouped by ingredient.")
+    parser.add_argument(
+        '--by-category',
+        action='store_true',
+        default=False,
+        help="Report the nutritional value grouped by category.")
     return parser
 
 
@@ -133,28 +140,32 @@ def make_log_data(line, ingredients, path, line_num):
         return parse_log_data(line, ingredients)
     except ParseError as err:
         logging.warning("%s (%s:%s)", err, path, line_num)
-        return LogData(name=line.strip(),
+        return LogData(name=line.split("#", 1)[0].strip(),
                        nutritional_value=NutritionalValue.UNKNOWN,
                        incomplete=True)
 
 
-def extract_log_lines(log):
+def extract_leaf_log_datas(log):
     lines = []
-    if log.log_line is not None:
-        lines.append(log.log_line)
+    if not log.parts:
+        lines.append(log)
     for part in log.parts:
-        lines.extend(extract_log_lines(part))
+        lines.extend(extract_leaf_log_datas(part))
     return lines
 
 
 def group_by_ingredient(log, ingredients):
-    log_lines = extract_log_lines(log)
+    leafs = extract_leaf_log_datas(log)
 
     grouped = collections.defaultdict(lambda: collections.defaultdict(int))
+    no_ingredient = []
 
-    for log_line in log_lines:
-        if log_line.ingredient is not None:
+    for log_data in leafs:
+        log_line = log_data.log_line
+        if log_line and log_line.ingredient:
             grouped[log_line.ingredient.name][log_line.unit] += log_line.amount
+        else:
+            no_ingredient.append(log_data)
 
     log_datas = []
 
@@ -173,13 +184,36 @@ def group_by_ingredient(log, ingredients):
         parts.sort(key=lambda x: x.nutritional_value.calories, reverse=True)
 
         if len(parts) == 1:
-            log_datas.append(parts[0])
+            log_datas.append(parts[0]._replace(ingredient=ingredient))
         else:
             name = "{} ({})".format(ingredient.name,
                                     " + ".join("{:.2f} {}".format(v, k)
                                                for k, v in amounts.items()))
-            log_datas.append(LogData.from_parts(name, parts))
+            log_datas.append(LogData.from_parts(name, parts,
+                                                ingredient=ingredient))
+
+    log_datas.extend(no_ingredient)
 
     log_datas.sort(key=lambda x: x.nutritional_value.calories, reverse=True)
 
     return LogData.from_parts('By ingredient', log_datas)
+
+
+def group_by_category(log, ingredients):
+    by_ingredient = group_by_ingredient(log, ingredients)
+    by_category = collections.defaultdict(list)
+
+    for part in by_ingredient.parts:
+        try:
+            category = part.ingredient.categories[0]
+        except (IndexError, AttributeError):
+            category = 'unknown'
+
+        by_category[category.strip().lower()].append(part)
+
+    categories = [LogData.from_parts(category.capitalize(), parts)
+                  for category, parts in by_category.items()]
+
+    categories.sort(key=lambda d: d.nutritional_value.calories, reverse=True)
+
+    return LogData.from_parts('By categories', categories)
