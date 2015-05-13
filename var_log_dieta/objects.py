@@ -107,9 +107,11 @@ _Ingredient = namedtuple_with_defaults(
         'sample_value',
         'sample_unit',
         'conversions',
+        'categories',
     ],
     defaults={
         'conversions': {},
+        'categories': [],
     }
 )  # yapf: disable
 
