@@ -138,23 +138,27 @@ def make_log_data(line, ingredients, path, line_num):
                        incomplete=True)
 
 
-def extract_log_lines(log):
+def extract_leaf_log_datas(log):
     lines = []
-    if log.log_line is not None:
-        lines.append(log.log_line)
+    if not log.parts:
+        lines.append(log)
     for part in log.parts:
-        lines.extend(extract_log_lines(part))
+        lines.extend(extract_leaf_log_datas(part))
     return lines
 
 
 def group_by_ingredient(log, ingredients):
-    log_lines = extract_log_lines(log)
+    leafs = extract_leaf_log_datas(log)
 
     grouped = collections.defaultdict(lambda: collections.defaultdict(int))
+    no_ingredient = []
 
-    for log_line in log_lines:
-        if log_line.ingredient is not None:
+    for log_data in leafs:
+        log_line = log_data.log_line
+        if log_line and log_line.ingredient:
             grouped[log_line.ingredient.name][log_line.unit] += log_line.amount
+        else:
+            no_ingredient.append(log_data)
 
     log_datas = []
 
@@ -173,12 +177,15 @@ def group_by_ingredient(log, ingredients):
         parts.sort(key=lambda x: x.nutritional_value.calories, reverse=True)
 
         if len(parts) == 1:
-            log_datas.append(parts[0])
+            log_datas.append(parts[0]._replace(ingredient=ingredient))
         else:
             name = "{} ({})".format(ingredient.name,
                                     " + ".join("{:.2f} {}".format(v, k)
                                                for k, v in amounts.items()))
-            log_datas.append(LogData.from_parts(name, parts))
+            log_datas.append(LogData.from_parts(name, parts,
+                                                ingredient=ingredient))
+
+    log_datas.extend(no_ingredient)
 
     log_datas.sort(key=lambda x: x.nutritional_value.calories, reverse=True)
 
