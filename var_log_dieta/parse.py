@@ -5,7 +5,7 @@ from __future__ import absolute_import, unicode_literals, division
 import logging
 import re
 
-from var_log_dieta.objects import LogLine, LogData
+from var_log_dieta.objects import LogLine, LogData, NutritionalValue
 from var_log_dieta.conversions import CantConvert
 
 logger = logging.getLogger(__name__)  # pylint: disable=invalid-name
@@ -23,7 +23,6 @@ RE_QUANTITY = r'(?P<amount>[\d.]+(?:\s*/\s*[\d.]+)?)\s*(?P<unit>{units_re})s?'
 
 
 def parse_log_line(line, valid_units=None, empty_unit=None):
-    line = line.strip()
     logger.debug('Parsing log line: "%s"', line)
     for regexp in [RE_INGREDIENT_COMMA_QUANTITY, RE_QUANTITY_OF_INGREDIENT]:
         if valid_units:
@@ -47,6 +46,7 @@ def parse_log_line(line, valid_units=None, empty_unit=None):
             unit = matchobj.group("unit") or empty_unit
 
             try:
+                # TODO(irossi): FIXME(irossi): ermahgerd, using eval!
                 amount = float(eval(amount))
             except (ValueError, TypeError, SyntaxError):
                 raise ParseError('"{}" is not a valid amount.'.format(amount))
@@ -76,8 +76,21 @@ def _parse_log_line(line):
 
 
 def parse_log_data(line, ingredients):
-    parsed = parse_log_line(line)
+    try:
+        line, comment = line.split('#', 1)
+    except ValueError:
+        line, comment = line, ''
+    try:
+        return _parse_log_data(line, ingredients)
+    except ParseError:
+        value = NutritionalValue.from_line(comment)
+        if value != NutritionalValue.UNKNOWN:
+            return LogData(name=line, nutritional_value=value)
+        raise
 
+
+def _parse_log_data(line, ingredients):
+    parsed = parse_log_line(line)
     try:
         ingredient = ingredients[parsed.name]
     except KeyError:
