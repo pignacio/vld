@@ -3,6 +3,7 @@
 from __future__ import absolute_import, unicode_literals, division
 
 import logging
+import re
 
 from pignacio_scripts.namedtuple import namedtuple_with_defaults
 
@@ -54,6 +55,17 @@ _NutritionalValue = namedtuple_with_defaults(
 
 class NutritionalValue(_NutritionalValue):
     UNKNOWN = None
+    _LINE_ALIASES = {
+        'k': 'calories',
+        'cal': 'calories',
+        'kcal': 'calories',
+        'c': 'carbs',
+        's': 'sugar',
+        'f': 'fat',
+        'sf': 'satueated_fat',
+        'tf': 'trans_fat',
+        'df': 'fiber',
+    }
 
     @classmethod
     def from_json(cls, jobj):
@@ -67,6 +79,22 @@ class NutritionalValue(_NutritionalValue):
                 if value is not None:
                     values_sum[index] += value
         return cls(*values_sum)
+
+    @classmethod
+    def from_line(cls, line):
+        values = {}
+        for part in re.split('[;,]', line):
+            logger.debug('from_line: part: %s', part)
+            try:
+                key, value = (x.strip() for x in re.split('[:=]', part, 1))
+                value = float(value)
+                field = cls._LINE_ALIASES.get(key, key)
+            except (KeyError, ValueError):
+                pass
+            else:
+                if field in cls._fields:
+                    values[field] = value
+        return cls(**values)
 
 
 NutritionalValue.UNKNOWN = NutritionalValue()
