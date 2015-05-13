@@ -140,7 +140,7 @@ def make_log_data(line, ingredients, path, line_num):
         return parse_log_data(line, ingredients)
     except ParseError as err:
         logging.warning("%s (%s:%s)", err, path, line_num)
-        return LogData(name=line.strip(),
+        return LogData(name=line.split("#", 1)[0].strip(),
                        nutritional_value=NutritionalValue.UNKNOWN,
                        incomplete=True)
 
