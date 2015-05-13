@@ -13,23 +13,25 @@ from .conversions import get_conversion_table, CantConvert
 logger = logging.getLogger(__name__)  # pylint: disable=invalid-name
 
 _LogData = namedtuple_with_defaults(
-    'LogData', ['name', 'nutritional_value', 'parts', 'log_line',
-                'incomplete'],
-    defaults=lambda: {'parts': [],
-                      'log_line': None,
-                      'incomplete': False})
+    'LogData', ['name', 'nutritional_value', 'parts', 'log_line', 'incomplete',
+                'ingredient'],
+    defaults=lambda:
+    {'parts': [],
+     'log_line': None,
+     'incomplete': False,
+     'ingredient': None})
 
 
 class LogData(_LogData):
     __slots__ = ()
 
     @classmethod
-    def from_parts(cls, name, parts):
+    def from_parts(cls, name, parts, **kwargs):
         return cls(name=name,
                    parts=parts,
                    nutritional_value=NutritionalValue.sum(p.nutritional_value
                                                           for p in parts),
-                   incomplete=any(p.incomplete for p in parts))
+                   incomplete=any(p.incomplete for p in parts), **kwargs)
 
 
 LogLine = namedtuple_with_defaults('LogLine', ['name', 'amount', 'unit',
