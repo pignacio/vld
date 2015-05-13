@@ -8,7 +8,7 @@ import logging
 from pignacio_scripts.testing import TestCase
 
 from var_log_dieta.objects import LogLine
-from var_log_dieta.parse import parse_log_line
+from var_log_dieta.parse import parse_log_line, ParseError
 
 logger = logging.getLogger(__name__)  # pylint: disable=invalid-name
 
@@ -77,7 +77,7 @@ class ParseLogLineTests(TestCase):
 
     def test_invalid_unit(self):
         valid_units = ('u', )
-        self.assertRaisesRegexp(ValueError, "is not a valid log line",
+        self.assertRaisesRegexp(ParseError, "is not a valid log line",
                                 parse_log_line, "1 g the ing",
                                 valid_units=valid_units)
 
@@ -86,4 +86,7 @@ class ParseLogLineTests(TestCase):
                          empty_unit="<empty>", )
 
     def test_empty_unit_fails_by_default(self):
-        self.assertRaises(ValueError, parse_log_line, "1 grande")
+        self.assertRaises(ParseError, parse_log_line, "1 grande")
+
+    def test_unit_plurals(self):
+        self._test_parse("2 gs the ing", "the ing", 2, "g", valid_units=("g",))
