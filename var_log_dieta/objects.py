@@ -69,6 +69,17 @@ class NutritionalValue(_NutritionalValue):
         'df': 'fiber',
     }
 
+    @property
+    def consumed_carbs(self):
+        return None if self.carbs is None else self.carbs - (self.fiber or 0)
+
+    def values(self):
+        res = self._asdict()
+        res.update({
+            'consumed_carbs': self.consumed_carbs,
+        })
+        return res
+
     @classmethod
     def from_json(cls, jobj):
         return cls(**jobj)
