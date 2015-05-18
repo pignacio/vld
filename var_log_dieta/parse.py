@@ -23,6 +23,7 @@ RE_QUANTITY = r'(?P<amount>[\d.]+(?:\s*/\s*[\d.]+)?)\s*(?P<unit>{units_re})s?'
 
 
 def parse_log_line(line, valid_units=None, empty_unit=None):
+    line = line.strip()
     logger.debug('Parsing log line: "%s"', line)
     for regexp in [RE_INGREDIENT_COMMA_QUANTITY, RE_QUANTITY_OF_INGREDIENT]:
         if valid_units:
