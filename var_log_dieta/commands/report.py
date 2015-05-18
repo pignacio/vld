@@ -20,7 +20,7 @@ from ..utils import base_argument_parser, get_terminal_size
 logger = logging.getLogger(__name__)  # pylint: disable=invalid-name
 
 _DEFAULT_FORMAT = (
-    '%(calories)s kCal (%(carbs)4s c, %(protein)4s p, %(fat)4s f) '
+    '%(calories)s kCal (%(consumed_carbs)4s cc, %(protein)4s p, %(fat)4s f) '
     '[%(fiber)4s df]')
 
 _DEFAULT_COLORS = [bright_green, bright_blue, bright_magenta, bright_cyan, red]
@@ -71,7 +71,7 @@ def get_argument_parser():
 def _log_values(nut_value):
     return {
         f: "???" if v is None else "{:.1f}".format(v)
-        for f, v in nut_value._asdict().items()
+        for f, v in nut_value.values().items()
     }
 
 
