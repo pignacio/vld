@@ -30,21 +30,27 @@ def main(options):
     ingredients = IngredientMap(load_ingredients(os.path.join(DATA_DIR,
                                                               'ingredients')))
 
-    log = process_log(options.file, ingredients)
-    if log is None:
-        print "The log was empty :("
+    parts = [process_log(f, ingredients) for f in options.file]
+    parts = [p for p in parts if p]
+    log = LogData.from_parts('all', parts)
+    if not parts:
+        print "The logs were empty :("
         return
     width = get_terminal_size()[0]
     if options.by_ingredient:
-        log = group_by_ingredient(log, ingredients)
+        logs = [group_by_ingredient(log, ingredients)]
     elif options.by_category:
-        log = group_by_category(log, ingredients)
-    print_log(log, max_levels=options.depth, width=width)
+        logs = [group_by_category(log, ingredients)]
+    else:
+        logs = parts
+
+    for log in logs:
+        print_log(log, max_levels=options.depth, width=width)
 
 
 def get_argument_parser():
     parser = base_argument_parser()
-    parser.add_argument('file', help='file/directory to process')
+    parser.add_argument('file', help='file/directory to process', nargs='+')
     parser.add_argument('-d', '--depth',
                         default=None,
                         type=int,
