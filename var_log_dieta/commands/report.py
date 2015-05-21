@@ -30,7 +30,8 @@ def main(options):
     ingredients = IngredientMap(load_ingredients(os.path.join(DATA_DIR,
                                                               'ingredients')))
 
-    parts = [process_log(f, ingredients) for f in options.file]
+    parts = [process_path(f, ingredients,
+                         sort_by=options.sort) for f in options.file]
     parts = [p for p in parts if p]
     log = LogData.from_parts('all', parts)
     if not parts:
@@ -38,9 +39,9 @@ def main(options):
         return
     width = get_terminal_size()[0]
     if options.by_ingredient:
-        logs = [group_by_ingredient(log, ingredients)]
+        logs = [group_by_ingredient(log, ingredients, sort_by=options.sort)]
     elif options.by_category:
-        logs = [group_by_category(log, ingredients)]
+        logs = [group_by_category(log, ingredients, sort_by=options.sort)]
     else:
         logs = parts
 
@@ -54,17 +55,24 @@ def get_argument_parser():
     parser.add_argument('-d', '--depth',
                         default=None,
                         type=int,
-                        help="Max depth to show.")
+                        help='Max depth to show.')
     parser.add_argument(
         '--by-ingredient',
         action='store_true',
         default=False,
-        help="Report the nutritional value grouped by ingredient.")
+        help='Report the nutritional value grouped by ingredient.')
     parser.add_argument(
         '--by-category',
         action='store_true',
         default=False,
-        help="Report the nutritional value grouped by category.")
+        help='Report the nutritional value grouped by category.')
+    parser.add_argument(
+        '--sort',
+        action='store',
+        default=None,
+        type=NutritionalValue.expand_field,
+        help=('Sorting for the log elements. Defaults to filename in '
+              'ungrouped reports and calories on grouped ones.'))
     return parser
 
 
@@ -108,7 +116,7 @@ def print_log(log,
         print
 
 
-def process_log(path, ingredients):
+def process_path(path, ingredients, sort_by=None):
     path = path.rstrip("/")
     if os.path.isfile(path):
         parts = get_log_file_parts(path, ingredients)
@@ -117,12 +125,12 @@ def process_log(path, ingredients):
 
         if '__init__' in log_parts:
             log_parts.remove('__init__')
-            init = process_log(os.path.join(path, '__init__'), ingredients)
+            init = process_path(os.path.join(path, '__init__'), ingredients)
             init_parts = init.parts if init else []
         else:
             init_parts = []
 
-        parts = [process_log(os.path.join(path, p), ingredients)
+        parts = [process_path(os.path.join(path, p), ingredients)
                  for p in log_parts]
         parts.extend(init_parts)
 
@@ -130,6 +138,9 @@ def process_log(path, ingredients):
 
     if not parts:
         return None
+
+    if sort_by is not None:
+        parts.sort(key=lambda p: getattr(p.nutritional_value, sort_by))
     return LogData.from_parts(os.path.basename(path), parts)
 
 
@@ -160,7 +171,7 @@ def extract_leaf_log_datas(log):
     return lines
 
 
-def group_by_ingredient(log, ingredients):
+def group_by_ingredient(log, ingredients, sort_by=None):
     leafs = extract_leaf_log_datas(log)
 
     grouped = collections.defaultdict(lambda: collections.defaultdict(int))
@@ -200,12 +211,14 @@ def group_by_ingredient(log, ingredients):
 
     log_datas.extend(no_ingredient)
 
-    log_datas.sort(key=lambda x: x.nutritional_value.calories, reverse=True)
+    sort_by = sort_by or 'calories'
+    log_datas.sort(key=lambda x: getattr(x.nutritional_value, sort_by),
+                   reverse=True)
 
     return LogData.from_parts('By ingredient', log_datas)
 
 
-def group_by_category(log, ingredients):
+def group_by_category(log, ingredients, sort_by=None):
     by_ingredient = group_by_ingredient(log, ingredients)
     by_category = collections.defaultdict(list)
 
@@ -220,6 +233,8 @@ def group_by_category(log, ingredients):
     categories = [LogData.from_parts(category.capitalize(), parts)
                   for category, parts in by_category.items()]
 
-    categories.sort(key=lambda d: d.nutritional_value.calories, reverse=True)
+    sort_by = sort_by or 'calories'
+    categories.sort(key=lambda x: getattr(x.nutritional_value, sort_by),
+                    reverse=True)
 
     return LogData.from_parts('By categories', categories)
