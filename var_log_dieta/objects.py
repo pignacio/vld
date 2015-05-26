@@ -13,13 +13,24 @@ from .conversions import get_conversion_table, CantConvert
 logger = logging.getLogger(__name__)  # pylint: disable=invalid-name
 
 _LogData = namedtuple_with_defaults(
-    'LogData', ['name', 'nutritional_value', 'parts', 'log_line', 'incomplete',
-                'ingredient'],
-    defaults=lambda:
-    {'parts': [],
-     'log_line': None,
-     'incomplete': False,
-     'ingredient': None})
+    'LogData',
+    [
+        'name',
+        'nutritional_value',
+        'parts',
+        'log_line',
+        'incomplete',
+        'ingredient',
+        'is_leaf',
+    ],
+    defaults=lambda: {
+        'parts': [],
+        'log_line': None,
+        'incomplete': False,
+        'ingredient': None,
+        'is_leaf': False,
+    }
+)  # yapf: disable
 
 
 class LogData(_LogData):
