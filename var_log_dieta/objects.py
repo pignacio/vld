@@ -193,3 +193,9 @@ class Ingredient(_Ingredient):
         }
 
         return self.sample_value._replace(**new_values)
+
+    def valid_units(self, base_unit=None):
+        base_unit = base_unit or self.sample_unit
+        res = self._conversion_table.get(base_unit, {})
+        res[base_unit] = 1
+        return {k: 1/v for k, v in res.items()}
