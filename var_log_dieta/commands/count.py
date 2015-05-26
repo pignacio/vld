@@ -55,6 +55,6 @@ def print_log_data(data):
     if data.nutritional_value == NutritionalValue.UNKNOWN:
         print "  Nutritional value:", red("UNKNOWN")
     else:
-        for key, value in data.nutritional_value._asdict().items():
+        for key, value in data.nutritional_value.values().items():
             print blue("  {}:".format(key)),
             print "???" if value is None else value
