@@ -144,22 +144,26 @@ class Ingredient(_Ingredient):
         res['sample_value'] = res['sample_value']._asdict()
         return res
 
-    def get_nutritional_value(self, amount, unit):
+    def convert(self, amount, unit, target_unit):
         if self.__conversion_table is None:
             self.__conversion_table = get_conversion_table(self.conversions,
                                                            DEFAULT_CONVERSIONS)
 
-        if unit == self.sample_unit:
-            unit_factor = 1.0
+        if unit == target_unit:
+            return amount
         else:
             try:
-                unit_factor = self.__conversion_table[unit][self.sample_unit]
+                factor = self.__conversion_table[unit][target_unit]
             except KeyError:
                 raise CantConvert(
                     "Cannot convert '{}' from '{}' to '{}'".format(
-                        self.name, self.sample_unit, unit))
+                        self.name, unit, target_unit))
 
-        factor = amount / self.sample_size * unit_factor
+        return amount * factor
+
+    def get_nutritional_value(self, amount, unit):
+        factor = self.convert(amount, unit,
+                              self.sample_unit) / self.sample_size
         new_values = {
             k: v * factor
             for k, v in self.sample_value._asdict().items() if v is not None
