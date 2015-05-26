@@ -53,6 +53,10 @@ def get_argument_parser():
     parser.add_argument('--sample-unit',
                         default='g',
                         help='Sample unit for the new ingredient')
+    parser.add_argument('--category',
+                        action='append',
+                        default=[],
+                        help='Category for the new ingredient')
     return parser
 
 
@@ -68,5 +72,6 @@ def main(options):
     ingredient = Ingredient(name=options.name,
                             sample_size=options.sample_size,
                             sample_unit=options.sample_unit,
-                            sample_value=sample_value)
+                            sample_value=sample_value,
+                            categories=options.category)
     print json.dumps(ingredient.as_json(), indent=1)
