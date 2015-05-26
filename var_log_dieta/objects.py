@@ -57,7 +57,7 @@ _NutritionalValue = namedtuple_with_defaults(
 
 class NutritionalValue(_NutritionalValue):
     UNKNOWN = None
-    _LINE_ALIASES = {
+    _FIELD_ALIASES = {
         'k': 'calories',
         'cal': 'calories',
         'kcal': 'calories',
@@ -67,7 +67,11 @@ class NutritionalValue(_NutritionalValue):
         'sf': 'saturated_fat',
         'tf': 'trans_fat',
         'df': 'fiber',
-    }
+        'p': 'protein',
+        'cc': 'consumed_carbs',
+    }  # yapf: disable
+
+    __sort_fields = set(_NutritionalValue._fields + ('consumed_carbs', ))
 
     @property
     def consumed_carbs(self):
@@ -75,9 +79,7 @@ class NutritionalValue(_NutritionalValue):
 
     def values(self):
         res = self._asdict()
-        res.update({
-            'consumed_carbs': self.consumed_carbs,
-        })
+        res.update({'consumed_carbs': self.consumed_carbs, })
         return res
 
     @classmethod
@@ -101,13 +103,22 @@ class NutritionalValue(_NutritionalValue):
             try:
                 key, value = (x.strip() for x in re.split('[:=]', part, 1))
                 value = float(value)
-                field = cls._LINE_ALIASES.get(key, key)
+                field = cls.expand_field(key)
             except (KeyError, ValueError):
                 pass
             else:
-                if field in cls._fields:
-                    values[field] = value
+                values[field] = value
         return cls(**values)
+
+    @classmethod
+    def expand_field(cls, short_field):
+        field = cls._FIELD_ALIASES.get(short_field, short_field)
+        logging.debug(
+            "Expanded NutValue field: {!r} => {!r}".format(short_field, field))
+        if field not in cls.__sort_fields:
+            raise ValueError(
+                'Invalid NutritionalValue field: "{}"'.format(short_field))
+        return field
 
 
 NutritionalValue.UNKNOWN = NutritionalValue()
