@@ -64,7 +64,7 @@ class NutritionalValue(_NutritionalValue):
         'c': 'carbs',
         's': 'sugar',
         'f': 'fat',
-        'sf': 'satueated_fat',
+        'sf': 'saturated_fat',
         'tf': 'trans_fat',
         'df': 'fiber',
     }
