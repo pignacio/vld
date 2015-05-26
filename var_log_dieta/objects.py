@@ -5,6 +5,7 @@ from __future__ import absolute_import, unicode_literals, division
 import logging
 import re
 
+from cached_property import cached_property
 from pignacio_scripts.namedtuple import namedtuple_with_defaults
 
 from .constants import DEFAULT_CONVERSIONS
@@ -166,16 +167,16 @@ class Ingredient(_Ingredient):
         res['sample_value'] = res['sample_value']._asdict()
         return res
 
-    def convert(self, amount, unit, target_unit):
-        if self.__conversion_table is None:
-            self.__conversion_table = get_conversion_table(self.conversions,
-                                                           DEFAULT_CONVERSIONS)
+    @cached_property
+    def _conversion_table(self):
+        return get_conversion_table(self.conversions, DEFAULT_CONVERSIONS)
 
+    def convert(self, amount, unit, target_unit):
         if unit == target_unit:
             return amount
         else:
             try:
-                factor = self.__conversion_table[unit][target_unit]
+                factor = self._conversion_table[unit][target_unit]
             except KeyError:
                 raise CantConvert(
                     "Cannot convert '{}' from '{}' to '{}'".format(
