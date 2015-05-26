@@ -6,7 +6,7 @@ import logging
 import sys
 
 from ..utils import base_argument_parser
-from . import report, new_ingredient, count, show_ingredients
+from . import report, new_ingredient, count, show_ingredients, price
 
 logger = logging.getLogger(__name__)  # pylint: disable=invalid-name
 
@@ -41,3 +41,7 @@ def vld_count():
 def vld_show_ingredients():
     return run_command(show_ingredients.main,
                        show_ingredients.get_argument_parser())
+
+
+def vld_price():
+    return run_command(price.main, price.get_argument_parser())

@@ -49,6 +49,7 @@ setup(
             'vld-new-ingredient=var_log_dieta.commands:vld_new_ingredient',
             'vld-count=var_log_dieta.commands:vld_count',
             'vld-show-ingredients=var_log_dieta.commands:vld_show_ingredients',
+            'vld-price=var_log_dieta.commands:vld_price',
         ],
     }
 )
