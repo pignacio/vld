@@ -30,8 +30,7 @@ def main(options):
     ingredients = IngredientMap(load_ingredients(os.path.join(DATA_DIR,
                                                               'ingredients')))
 
-    parts = [process_path(f, ingredients,
-                         sort_by=options.sort) for f in options.file]
+    parts = [process_path(f, ingredients) for f in options.file]
     parts = [p for p in parts if p]
     log = LogData.from_parts('all', parts)
     if not parts:
@@ -116,47 +115,58 @@ def print_log(log,
         print
 
 
-def process_path(path, ingredients, sort_by=None):
-    path = path.rstrip("/")
-    if os.path.isfile(path):
-        parts = get_log_file_parts(path, ingredients)
+def process_log(name, log, ingredients):
+    if '__init__' in log:
+        init_parts = process_log_leaf(log['__init__'], ingredients)
     else:
-        log_parts = sorted(os.listdir(path))
+        init_parts = []
 
-        if '__init__' in log_parts:
-            log_parts.remove('__init__')
-            init = process_path(os.path.join(path, '__init__'), ingredients)
-            init_parts = init.parts if init else []
-        else:
-            init_parts = []
-
-        parts = [process_path(os.path.join(path, p), ingredients)
-                 for p in log_parts]
-        parts.extend(init_parts)
+    parts = [process_log(n, sublog, ingredients)
+             for n, sublog in sorted(log.items()) if n != '__init__']
+    parts.extend(init_parts)
 
     parts = [p for p in parts if p]
 
-    if not parts:
-        return None
+    #    if not parts:
+    #        return None
 
-    if sort_by is not None:
-        parts.sort(key=lambda p: getattr(p.nutritional_value, sort_by))
-    return LogData.from_parts(os.path.basename(path), parts)
+    return LogData.from_parts(name, parts)
 
 
-def get_log_file_parts(path, ingredients):
-    with open(path) as fin:
-        lines = (l for l in fin if l.strip() and not l.strip().startswith('#'))
+def process_log_leaf(log_leaf, ingredients):
+    lines = (l for l in log_leaf
+             if l.strip() and not l.strip().startswith('#'))
 
-        return [make_log_data(l, ingredients, path, ln)
-                for ln, l in enumerate(lines)]
+    return [make_log_data(l, ingredients)._replace(is_leaf=True)
+            for ln, l in enumerate(lines)]
 
 
-def make_log_data(line, ingredients, path, line_num):
+def process_path(path, ingredients):
+    log = path_to_log(path)
+    processed = process_log(os.path.basename(path.rstrip('/')), log,
+                            ingredients)
+    return processed
+
+
+def path_to_log(path):
+    path = path.rstrip("/")
+    if os.path.isfile(path):
+        with open(path) as fin:
+            lines = fin.readlines()
+        if os.path.basename(path) == '__init__':
+            return lines
+        return {'__init__': lines}
+    else:
+        return {
+            l: path_to_log(os.path.join(path, l))
+            for l in os.listdir(path)
+        }
+
+
+def make_log_data(line, ingredients):
     try:
         return parse_log_data(line, ingredients)
     except ParseError as err:
-        logging.warning("%s (%s:%s)", err, path, line_num)
         return LogData(name=line.split("#", 1)[0].strip(),
                        nutritional_value=NutritionalValue.UNKNOWN,
                        incomplete=True)
