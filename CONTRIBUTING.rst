@@ -13,7 +13,7 @@ Types of Contributions
 Report Bugs
 ~~~~~~~~~~~
 
-Report bugs at https://github.com/pignacio/var_log_dieta/issues.
+Report bugs at https://github.com/pignacio/vld/issues.
 
 If you are reporting a bug, please include:
 
@@ -43,7 +43,7 @@ articles, and such.
 Submit Feedback
 ~~~~~~~~~~~~~~~
 
-The best way to send feedback is to file an issue at https://github.com/pignacio/var_log_dieta/issues.
+The best way to send feedback is to file an issue at https://github.com/pignacio/vld/issues.
 
 If you are proposing a feature:
 
@@ -55,17 +55,17 @@ If you are proposing a feature:
 Get Started!
 ------------
 
-Ready to contribute? Here's how to set up `var_log_dieta` for local development.
+Ready to contribute? Here's how to set up `vld` for local development.
 
-1. Fork the `var_log_dieta` repo on GitHub.
+1. Fork the `vld` repo on GitHub.
 2. Clone your fork locally::
 
-    $ git clone git@github.com:your_name_here/var_log_dieta.git
+    $ git clone git@github.com:your_name_here/vld.git
 
 3. Install your local copy into a virtualenv. Assuming you have virtualenvwrapper installed, this is how you set up your fork for local development::
 
-    $ mkvirtualenv var_log_dieta
-    $ cd var_log_dieta/
+    $ mkvirtualenv vld
+    $ cd vld/
     $ python setup.py develop
 
 4. Create a branch for local development::
@@ -100,7 +100,7 @@ Before you submit a pull request, check that it meets these guidelines:
    your new functionality into a function with a docstring, and add the
    feature to the list in README.rst.
 3. The pull request should work for Python 2.7, 3.3, and 3.4. Check
-   https://travis-ci.org/pignacio/var_log_dieta/pull_requests
+   https://travis-ci.org/pignacio/vld/pull_requests
    and make sure that the tests pass for all supported Python versions.
 
 Tips
@@ -108,4 +108,4 @@ Tips
 
 To run a subset of tests::
 
-    $ python setup.py nosetests --tests tests/test_var_log_dieta
+    $ python setup.py nosetests --tests tests/test_vld

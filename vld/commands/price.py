@@ -8,12 +8,12 @@ import logging
 import re
 import os
 
-from var_log_dieta.constants import DATA_DIR
-from var_log_dieta.ingredient import IngredientMap
-from var_log_dieta.serialization import load_ingredients
-from var_log_dieta.parse import parse_log_data, ParseError
-from var_log_dieta.objects import CantConvert, LogData, NutritionalValue
-from var_log_dieta.utils import base_argument_parser
+from vld.constants import DATA_DIR
+from vld.ingredient import IngredientMap
+from vld.serialization import load_ingredients
+from vld.parse import parse_log_data, ParseError
+from vld.objects import CantConvert, LogData, NutritionalValue
+from vld.utils import base_argument_parser
 
 logger = logging.getLogger(__name__)  # pylint: disable=invalid-name
 
