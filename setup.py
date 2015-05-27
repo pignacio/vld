@@ -19,7 +19,7 @@ requirements = [
 
 setup(
     name='vld',
-    version='0.0.1',
+    version='0.0.2-dev',
     description="A diet logger.",
     long_description=readme + '\n\n' + history,
     author="Ignacio Rossi",
