@@ -5,8 +5,8 @@ from __future__ import absolute_import, unicode_literals, division
 import logging
 import re
 
-from var_log_dieta.objects import LogLine, LogData, NutritionalValue
-from var_log_dieta.conversions import CantConvert
+from vld.objects import LogLine, LogData, NutritionalValue
+from vld.conversions import CantConvert
 
 logger = logging.getLogger(__name__)  # pylint: disable=invalid-name
 

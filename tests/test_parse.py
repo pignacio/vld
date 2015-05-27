@@ -7,8 +7,8 @@ import logging
 
 from pignacio_scripts.testing import TestCase
 
-from var_log_dieta.objects import LogLine
-from var_log_dieta.parse import parse_log_line, ParseError
+from vld.objects import LogLine
+from vld.parse import parse_log_line, ParseError
 
 logger = logging.getLogger(__name__)  # pylint: disable=invalid-name
 

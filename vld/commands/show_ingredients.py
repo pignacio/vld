@@ -8,10 +8,10 @@ import sys
 
 from pignacio_scripts.terminal.color import green, blue, red
 
-from var_log_dieta.constants import DATA_DIR
-from var_log_dieta.objects import NutritionalValue, CantConvert
-from var_log_dieta.serialization import load_ingredients
-from var_log_dieta.utils import base_argument_parser
+from vld.constants import DATA_DIR
+from vld.objects import NutritionalValue, CantConvert
+from vld.serialization import load_ingredients
+from vld.utils import base_argument_parser
 
 logger = logging.getLogger(__name__)  # pylint: disable=invalid-name
 

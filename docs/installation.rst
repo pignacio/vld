@@ -4,9 +4,13 @@ Installation
 
 At the command line::
 
-    $ easy_install var_log_dieta
+    $ easy_install vld
 
 Or, if you have virtualenvwrapper installed::
 
-    $ mkvirtualenv var_log_dieta
-    $ pip install var_log_dieta
+    $ mkvirtualenv vld
+    $ pip install vld
+
+Or, with pipsi::
+
+    $ pip install vld

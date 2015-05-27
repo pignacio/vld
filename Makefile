@@ -37,15 +37,15 @@ clean-test:
 lint:
 	@if ! which pep8 >/dev/null; then echo "pep8 not installed.\nRun:\n    pip install pep8" && false; fi
 	@if ! which pylint >/dev/null; then echo "pylint not installed.\nRun:\n    pip install pylint" && false; fi
-	-pep8 var_log_dieta tests
-	-find var_log_dieta -name "*.py" -exec pylint {} +
+	-pep8 vld tests
+	-find vld -name "*.py" -exec pylint {} +
 	-find tests -name "*.py" -exec pylint {} +
 
 test: test-deps clean-pyc
 	python setup.py nosetests
 
 test-cover: test-deps clean-pyc
-	python setup.py nosetests --with-coverage --cover-package=var_log_dieta
+	python setup.py nosetests --with-coverage --cover-package=vld
 
 test-all: test-deps clean-pyc
 	@if ! which tox >/dev/null; then echo "tox not installed.\nRun:\n    pip install tox" && false; fi
@@ -55,7 +55,7 @@ test-deps:
 	pip install -r requirements/test.txt
 
 coverage: test-deps clean-pyc
-	coverage run --source var_log_dieta setup.py nosetests
+	coverage run --source vld setup.py nosetests
 	make coverage-show
 
 coverage-all:
@@ -69,9 +69,9 @@ coverage-show:
 	see htmlcov/index.html
 
 docs: docs-deps
-	rm -f docs/var_log_dieta.rst
+	rm -f docs/vld.rst
 	rm -f docs/modules.rst
-	sphinx-apidoc -o docs/ var_log_dieta
+	sphinx-apidoc -o docs/ vld
 	$(MAKE) -C docs clean
 	$(MAKE) -C docs html
 	see docs/_build/html/index.html
@@ -95,4 +95,4 @@ install: clean
 	python setup.py install
 
 yapf:
-	find var_log_dieta -name "*.py" -exec echo {} \; -exec yapf --diff {} \;
+	find vld -name "*.py" -exec echo {} \; -exec yapf --diff {} \;

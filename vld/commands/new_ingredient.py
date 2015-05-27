@@ -5,8 +5,8 @@ from __future__ import absolute_import, unicode_literals, division
 import json
 import logging
 
-from var_log_dieta.objects import Ingredient, NutritionalValue
-from var_log_dieta.utils import base_argument_parser
+from vld.objects import Ingredient, NutritionalValue
+from vld.utils import base_argument_parser
 
 logger = logging.getLogger(__name__)  # pylint: disable=invalid-name
 
