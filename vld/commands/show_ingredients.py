@@ -77,7 +77,7 @@ def main(options):
         'calories': 'cals',
         'saturated_fat': 'sat fat',
         'trans_fat': 'trans',
-        'consumed_carbs': 'cc',
+        'net_carbs': 'nc',
         'protein': 'prot'
     }
 

@@ -20,7 +20,7 @@ from ..utils import base_argument_parser, get_terminal_size
 logger = logging.getLogger(__name__)  # pylint: disable=invalid-name
 
 _DEFAULT_FORMAT = (
-    '%(calories)s kCal (%(consumed_carbs)4s cc, %(protein)4s p, %(fat)4s f) '
+    '%(calories)s kCal (%(net_carbs)4s nc, %(protein)4s p, %(fat)4s f) '
     '[%(fiber)4s df]')
 
 _DEFAULT_COLORS = [bright_green, bright_blue, bright_magenta, bright_cyan, red]
