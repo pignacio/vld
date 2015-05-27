@@ -80,18 +80,18 @@ class NutritionalValue(_NutritionalValue):
         'tf': 'trans_fat',
         'df': 'fiber',
         'p': 'protein',
-        'cc': 'consumed_carbs',
+        'nc': 'net_carbs',
     }  # yapf: disable
 
-    __sort_fields = set(_NutritionalValue._fields + ('consumed_carbs', ))
+    __sort_fields = set(_NutritionalValue._fields + ('net_carbs', ))
 
     @property
-    def consumed_carbs(self):
+    def net_carbs(self):
         return None if self.carbs is None else self.carbs - (self.fiber or 0)
 
     def values(self):
         res = self._asdict()
-        res.update({'consumed_carbs': self.consumed_carbs, })
+        res.update({'net_carbs': self.net_carbs, })
         return res
 
     @classmethod
