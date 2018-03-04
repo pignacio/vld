@@ -2,11 +2,11 @@
 /var/log/dieta
 ===============================
 
-.. image:: https://pypip.in/version/vld/badge.svg?style=flat
+.. image:: https://img.shields.io/pypi/v/vld.svg?style=flat
     :target: https://pypi.python.org/pypi/vld/
     :alt: Latest version
 
-.. image:: https://pypip.in/py_versions/vld/badge.svg?style=flat
+.. image:: https://img.shields.io/pypi/pyversions/vld.svg?style=flat
     :target: https://pypi.python.org/pypi/vld/
     :alt: Supported Python versions
 
@@ -16,7 +16,7 @@
 .. image:: https://coveralls.io/repos/pignacio/vld/badge.svg?branch=master
     :target: https://coveralls.io/r/pignacio/vld?branch=master
 
-.. image:: https://pypip.in/license/vld/badge.svg?style=flat
+.. image:: https://img.shields.io/pypi/l/vld.svg?style=flat
     :target: https://pypi.python.org/pypi/vld/
     :alt: License
 
